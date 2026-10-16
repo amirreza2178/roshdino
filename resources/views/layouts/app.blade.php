@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#080C0A">
+    <meta name="theme-color" content="#0B1220">
     <meta name="color-scheme" content="dark">
     <meta name="description" content="@yield('meta_description', 'رشدینو یک استودیو رشد دیجیتال است؛ از طراحی و توسعه وب و نرم‌افزار اختصاصی تا راهکارهای رشد برای ساخت تجربه‌های دیجیتال قابل‌استفاده و قابل‌توسعه.')">
     @hasSection('robots')
