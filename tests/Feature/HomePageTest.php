@@ -2,17 +2,24 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class HomePageTest extends TestCase
 {
+    use RefreshDatabase;
     public function test_home_page_loads_successfully(): void
     {
         $this->get(route('home'))
             ->assertOk()
             ->assertSee('رشدینو')
             ->assertSee('کسب‌وکارت را')
-            ->assertSee('DIGITAL GROWTH STUDIO');
+            ->assertSee('استودیو رشد دیجیتال')
+            ->assertDontSee('DIGITAL GROWTH STUDIO')
+            ->assertDontSee('SELECTED WORK')
+            ->assertDontSee('CASE STUDY')
+            ->assertDontSee("LET'S START")
+            ->assertDontSee('WEB × SOFTWARE');
     }
 
     public function test_home_page_contains_core_conversion_sections(): void
@@ -26,7 +33,16 @@ class HomePageTest extends TestCase
             ->assertSee('نرم‌افزار اختصاصی')
             ->assertSee('راهکارهای رشد دیجیتال')
             ->assertSee('Personal System Faraja')
-            ->assertSee('شروع گفتگو');
+            ->assertSee('شروع گفتگو')
+            ->assertSee('درخواست')
+            ->assertSee('راه تماس')
+            ->assertSee('رزرو جلسه')
+            ->assertSee('intent=request', false)
+            ->assertSee('intent=contact', false)
+            ->assertSee('intent=meeting', false)
+            ->assertSee('service=web', false)
+            ->assertSee('service=software', false)
+            ->assertSee('service=growth', false);
     }
 
     public function test_home_page_contains_main_navigation_sections(): void
@@ -83,16 +99,41 @@ class HomePageTest extends TestCase
             ->assertSee('viewport-fit=cover', false);
     }
 
+    public function test_home_page_offers_a_direct_telegram_chat_and_phone(): void
+    {
+        config([
+            'roshdino.contact.telegram' => 'amirreza2178',
+            'roshdino.contact.phone' => '09029196802',
+        ]);
+
+        $response = $this->get(route('home'))->assertOk();
+
+        $response
+            ->assertSee('پیام در تلگرام')
+            ->assertSee('href="https://t.me/amirreza2178"', false)
+            ->assertSee('href="tel:09029196802"', false)
+            ->assertSee('09029196802');
+
+        preg_match('/<script type="application\/ld\+json">\s*(.*?)\s*<\/script>/s', $response->getContent(), $matches);
+        $schema = json_decode($matches[1] ?? '', true);
+
+        $this->assertSame(['https://t.me/amirreza2178'], $schema['sameAs'] ?? null);
+        $this->assertSame('09029196802', $schema['telephone'] ?? null);
+    }
+
     public function test_home_page_contains_process_and_low_friction_cta(): void
     {
         $response = $this->get(route('home'));
 
         $response
-            ->assertSee('DISCOVER')
-            ->assertSee('DESIGN')
-            ->assertSee('BUILD')
-            ->assertSee('GROW')
+            ->assertSee('شناخت')
+            ->assertSee('طراحی')
+            ->assertSee('ساخت')
+            ->assertSee('رشد')
+            ->assertDontSee('DISCOVER')
             ->assertSee('شروع یک پروژه')
-            ->assertSee('mailto:hello@roshdino.test', false);
+            ->assertSee(route('leads.store'), false)
+            ->assertSee('name="problem"', false)
+            ->assertDontSee('mailto:hello@roshdino.test', false);
     }
 }

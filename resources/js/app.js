@@ -45,6 +45,27 @@ document.addEventListener("click", (event) => {
     }
 });
 
+const mobileCta = document.querySelector(".mobile-cta");
+const ctaAnchors = document.querySelectorAll(
+    ".hero__actions, .offer-hero .button, .offer-close .button, .offer-form .button, #contact, #services .service-card__action, #services .service-card__more, #services .service-card__footer"
+);
+
+if (mobileCta && ctaAnchors.length > 0 && "IntersectionObserver" in window) {
+    const visibleAnchors = new Set();
+    const ctaObserver = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) visibleAnchors.add(entry.target);
+                else visibleAnchors.delete(entry.target);
+            });
+            mobileCta.classList.toggle("is-hidden", visibleAnchors.size > 0);
+        },
+        { threshold: 0 }
+    );
+
+    ctaAnchors.forEach((anchor) => ctaObserver.observe(anchor));
+}
+
 const updateHeader = () => {
     header?.classList.toggle("is-scrolled", window.scrollY > 12);
 };

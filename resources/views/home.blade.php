@@ -1,140 +1,162 @@
 @extends('layouts.app')
 
-@section('title', 'رشدینو | طراحی سایت، نرم‌افزار اختصاصی و رشد دیجیتال')
-@section('meta_description', 'رشدینو یک استودیو رشد دیجیتال است؛ طراحی و توسعه وب، نرم‌افزار اختصاصی و راهکارهای رشد برای کسب‌وکارهایی که می‌خواهند تجربه دیجیتال قابل‌استفاده و قابل‌توسعه داشته باشند.')
-@section('og_title', 'رشدینو | استودیو رشد دیجیتال')
-@section('og_description', 'وب، نرم‌افزار و راهکارهای رشد دیجیتال برای حل مسئله واقعی کسب‌وکار.')
+@section('title', $site['seo_title'] !== '' ? $site['seo_title'] : 'رشدینو | طراحی سایت، نرم‌افزار اختصاصی و رشد دیجیتال')
+@section('meta_description', $site['seo_description'] !== '' ? $site['seo_description'] : 'رشدینو یک استودیو رشد دیجیتال است؛ طراحی و توسعه وب، نرم‌افزار اختصاصی و راهکارهای رشد برای کسب‌وکارهایی که می‌خواهند تجربه دیجیتال قابل‌استفاده و قابل‌توسعه داشته باشند.')
+@section('og_title', $site['seo_og_title'] !== '' ? $site['seo_og_title'] : 'رشدینو | استودیو رشد دیجیتال')
+@section('og_description', $site['seo_og_description'] !== '' ? $site['seo_og_description'] : 'وب، نرم‌افزار و راهکارهای رشد دیجیتال برای حل مسئله واقعی کسب‌وکار.')
+@section('canonical', $site['seo_canonical'] !== '' ? $site['seo_canonical'] : url()->current())
+@section('robots', $site['indexable'] ? 'index, follow' : 'noindex, nofollow')
+@if ($site['og_image'] !== '')
+    @section('og_image', $site['og_image'])
+@endif
 
 @section('content')
     <section class="hero section">
         <div class="shell hero__layout">
             <div class="hero__content reveal">
-                <p class="eyebrow"><span></span> DIGITAL GROWTH STUDIO</p>
-                <h1>کسب‌وکارت را <em>دیجیتال‌تر، ساده‌تر و قابل‌رشدتر</em> کن.</h1>
-                <p class="hero__lead">
-                    از طراحی و توسعه وب و نرم‌افزار اختصاصی تا راهکارهای رشد دیجیتال؛
-                    مسئله کسب‌وکارت را بررسی می‌کنیم و راهکاری می‌سازیم که واقعاً قابل استفاده باشد.
-                </p>
+                <p class="eyebrow eyebrow--fa"><span></span> {{ $home['hero']['eyebrow'] }}</p>
+                <h1>{!! \App\Models\HomePage::emphasized($home['hero']['title'], $home['hero']['accent']) !!}</h1>
+                <p class="hero__lead">{{ $home['hero']['lead'] }}</p>
 
                 <div class="hero__actions">
-                    <a href="#contact" class="button button--lime">شروع یک پروژه <span aria-hidden="true">←</span></a>
+                    <a href="{{ route('home', ['intent' => 'request']) }}#contact" class="button button--lime button--large">شروع یک پروژه <span aria-hidden="true">←</span></a>
                     <a href="#work" class="button button--ghost">دیدن نمونه‌کار <span aria-hidden="true">↓</span></a>
                 </div>
 
-                <a href="#contact" class="micro-link">
+                <a href="{{ route('home', ['intent' => 'request']) }}#contact" class="micro-link">
                     هنوز نمی‌دانی دقیقاً به چه چیزی نیاز داری؟ <strong>مسئله‌ات را بفرست.</strong>
                 </a>
 
-                <div class="hero__stats" aria-label="حوزه‌های فعالیت">
-                    <div><strong>WEB</strong><span>تجربه دیجیتال</span></div>
-                    <div><strong>SOFTWARE</strong><span>سیستم اختصاصی</span></div>
-                    <div><strong>GROWTH</strong><span>مسیر رشد</span></div>
-                </div>
+                <p class="hero__note">{{ $home['hero']['note'] }}</p>
             </div>
 
-            <div class="hero-visual reveal" aria-label="نمایی از رویکرد رشدینو">
-                <div class="hero-visual__orb" aria-hidden="true"></div>
-                <div class="hero-visual__content">
-                    <div class="hero-visual__top">
-                        <span>ROSHDINO / 01</span>
-                        <span>GROWTH SYSTEM</span>
-                    </div>
-                    <div class="hero-visual__headline">
-                        <span>مسئله</span>
-                        <i></i>
-                        <span>راهکار</span>
-                        <i></i>
-                        <span>رشد</span>
-                    </div>
-                    <div class="hero-visual__flow">
-                        <div><small>01</small><b>DISCOVER</b><span>مسئله را می‌فهمیم</span></div>
-                        <div><small>02</small><b>BUILD</b><span>راهکار را می‌سازیم</span></div>
-                        <div><small>03</small><b>GROW</b><span>بهبود را اندازه می‌گیریم</span></div>
-                    </div>
-                    <div class="hero-visual__footer">
-                        <span>WEB × SOFTWARE × GROWTH</span>
-                        <span class="pulse-dot" aria-hidden="true"></span>
-                    </div>
-                </div>
-            </div>
+            <aside class="hero__paths" aria-label="سه مسیر">
+                <p class="eyebrow eyebrow--fa"><span></span> سه مسیر</p>
+                @forelse ($services->take(3) as $service)
+                    <a class="hero__path" href="{{ route('services.show', $service->slug) }}">
+                        <span>{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
+                        <strong>{{ $service->title }}</strong>
+                        <p>{{ $service->description }}</p>
+                    </a>
+                @empty
+                    <a class="hero__path" href="{{ route('home', ['intent' => 'request', 'service' => 'web']) }}#contact">
+                        <span>01</span>
+                        <strong>طراحی و توسعه وب</strong>
+                        <p>سایت‌هایی سریع، حرفه‌ای و قابل توسعه که فقط زیبا نیستند؛ برای کسب‌وکار کار می‌کنند.</p>
+                    </a>
+                    <a class="hero__path" href="{{ route('home', ['intent' => 'request', 'service' => 'software']) }}#contact">
+                        <span>02</span>
+                        <strong>نرم‌افزار اختصاصی</strong>
+                        <p>فرآیندهای پیچیده کسب‌وکارت را به یک سیستم ساده، قابل کنترل و قابل توسعه تبدیل می‌کنیم.</p>
+                    </a>
+                    <a class="hero__path" href="{{ route('home', ['intent' => 'request', 'service' => 'growth']) }}#contact">
+                        <span>03</span>
+                        <strong>راهکارهای رشد دیجیتال</strong>
+                        <p>از ساختار سایت و محتوا تا تجربه کاربر و مسیر تبدیل؛ نقاط اصطکاک را پیدا می‌کنیم و بهبود می‌دهیم.</p>
+                    </a>
+                @endforelse
+            </aside>
         </div>
     </section>
 
     <section class="section section--problem" id="problem">
         <div class="shell">
             <div class="section-intro reveal">
-                <p class="eyebrow"><span></span> THE REAL PROBLEM</p>
-                <h2>هر پروژه باید یک <em>مسئله واقعی</em> را حل کند.</h2>
-                <p>قبل از انتخاب تکنولوژی، باید بفهمیم چه چیزی در کسب‌وکار اصطکاک ایجاد کرده است.</p>
+                <p class="eyebrow eyebrow--fa"><span></span> {{ $home['problem']['eyebrow'] }}</p>
+                <h2>{!! \App\Models\HomePage::emphasized($home['problem']['title'], $home['problem']['accent']) !!}</h2>
+                <p>{{ $home['problem']['lead'] }}</p>
             </div>
 
             <div class="problem-list">
-                <article class="problem-item reveal">
-                    <span>01</span>
-                    <div>
-                        <h3>سایت داری، اما مشتری نمی‌آورد؟</h3>
-                        <p>مشکل همیشه ظاهر سایت نیست. مسیر کاربر، پیام، اعتماد و نقطه تبدیل را باید کنار هم دید.</p>
-                    </div>
-                    <span class="problem-arrow" aria-hidden="true">↗</span>
-                </article>
-                <article class="problem-item reveal">
-                    <span>02</span>
-                    <div>
-                        <h3>فرآیندهایت دستی و پراکنده شده‌اند؟</h3>
-                        <p>وقتی سفارش، مشتری و عملیات در چند ابزار جدا هستند، یک سیستم متناسب با فرآیند واقعی می‌تواند مسیر را ساده کند.</p>
-                    </div>
-                    <span class="problem-arrow" aria-hidden="true">↗</span>
-                </article>
-                <article class="problem-item reveal">
-                    <span>03</span>
-                    <div>
-                        <h3>مخاطب داری، اما مسیر رشد نداری؟</h3>
-                        <p>جذب مخاطب پایان مسیر نیست؛ تجربه، محتوا، اعتماد و تبدیل باید در یک سیستم کنار هم قرار بگیرند.</p>
-                    </div>
-                    <span class="problem-arrow" aria-hidden="true">↗</span>
-                </article>
+                @foreach ($home['problem']['items'] as $item)
+                    <article class="problem-item reveal">
+                        <span>{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
+                        <div>
+                            <h3>{{ $item['title'] }}</h3>
+                            <p>{{ $item['body'] }}</p>
+                        </div>
+                        <a href="{{ route('home', ['intent' => 'request']) }}#contact" class="problem-arrow" aria-label="درباره {{ $item['title'] }} گفتگو کنیم">حل مشکل</a>
+                    </article>
+                @endforeach
             </div>
         </div>
     </section>
 
-    <section class="section section--ivory" id="services">
+    <section class="section section--services" id="services">
         <div class="shell">
-            <div class="section-intro section-intro--dark reveal">
-                <p class="eyebrow"><span></span> WHAT WE BUILD</p>
+            <div class="section-intro section-intro--services reveal">
+                <p class="eyebrow eyebrow--fa"><span></span> سه مسیر</p>
                 <h2>راهکاری بساز که <em>برای کسب‌وکار کار کند.</em></h2>
                 <p>سه مسیر اصلی داریم؛ اما نقطه شروع همیشه مسئله توست، نه تکنولوژی.</p>
             </div>
 
-            <div class="service-list">
-                <article class="service-row reveal">
-                    <div class="service-row__number">01</div>
-                    <div class="service-row__main">
-                        <h3>طراحی و توسعه وب</h3>
-                        <p>سایت‌هایی سریع، حرفه‌ای و قابل توسعه که فقط زیبا نیستند؛ برای کسب‌وکار کار می‌کنند.</p>
-                        <ul><li>UX و UI</li><li>توسعه اختصاصی</li><li>SEO و Performance</li></ul>
-                    </div>
-                    <a href="#contact" class="service-row__link" aria-label="درخواست درباره طراحی و توسعه وب">↗</a>
-                </article>
+            <div class="services-grid">
+                @forelse ($services as $service)
+                    <article class="service-card reveal">
+                        <header class="service-card__header">
+                            <span class="service-card__index" aria-hidden="true">{{ str_pad((string) ($loop->iteration), 2, '0', STR_PAD_LEFT) }}</span>
+                            <div class="service-card__heading">
+                                <h3><a href="{{ route('services.show', $service->slug) }}">{{ $service->title }}</a></h3>
+                            </div>
+                            <a href="{{ $service->ctaHref() }}" class="service-card__action" aria-label="درخواست درباره {{ $service->title }}"><span class="service-card__action-label">{{ $service->cta_label }}</span><span aria-hidden="true">↗</span></a>
+                        </header>
+                        <div class="service-card__content">
+                            <p class="service-card__description">{{ $service->description }}</p>
+                            @if ($service->benefits !== [])
+                                <ul class="service-card__tags">
+                                    @foreach ($service->benefits as $benefit)
+                                        <li>{{ $benefit }}</li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </div>
+                        <footer class="service-card__footer">
+                            <a href="{{ route('services.show', $service->slug) }}" class="service-card__more">مسیر این کار را ببین</a>
+                        </footer>
+                    </article>
+                @empty
+                    <article class="service-card reveal">
+                        <header class="service-card__header">
+                            <span class="service-card__index" aria-hidden="true">01</span>
+                            <div class="service-card__heading">
+                                <h3>طراحی و توسعه وب</h3>
+                            </div>
+                            <a href="{{ route('home', ['intent' => 'request', 'service' => 'web']) }}#contact" class="service-card__action" aria-label="درخواست درباره طراحی و توسعه وب"><span class="service-card__action-label">گفتگو</span><span aria-hidden="true">↗</span></a>
+                        </header>
+                        <div class="service-card__content">
+                            <p class="service-card__description">سایت‌هایی سریع، حرفه‌ای و قابل توسعه که فقط زیبا نیستند؛ برای کسب‌وکار کار می‌کنند.</p>
+                            <ul class="service-card__tags"><li>تجربه کاربر</li><li>توسعه اختصاصی</li><li>جستجو و سرعت</li></ul>
+                        </div>
+                    </article>
 
-                <article class="service-row reveal">
-                    <div class="service-row__number">02</div>
-                    <div class="service-row__main">
-                        <h3>نرم‌افزار اختصاصی</h3>
-                        <p>فرآیندهای پیچیده کسب‌وکارت را به یک سیستم ساده، قابل کنترل و قابل توسعه تبدیل می‌کنیم.</p>
-                        <ul><li>سیستم‌های اختصاصی</li><li>اتوماسیون</li><li>داشبورد و Workflow</li></ul>
-                    </div>
-                    <a href="#contact" class="service-row__link" aria-label="درخواست درباره نرم‌افزار اختصاصی">↗</a>
-                </article>
+                    <article class="service-card reveal">
+                        <header class="service-card__header">
+                            <span class="service-card__index" aria-hidden="true">02</span>
+                            <div class="service-card__heading">
+                                <h3>نرم‌افزار اختصاصی</h3>
+                            </div>
+                            <a href="{{ route('home', ['intent' => 'request', 'service' => 'software']) }}#contact" class="service-card__action" aria-label="درخواست درباره نرم‌افزار اختصاصی"><span class="service-card__action-label">گفتگو</span><span aria-hidden="true">↗</span></a>
+                        </header>
+                        <div class="service-card__content">
+                            <p class="service-card__description">فرآیندهای پیچیده کسب‌وکارت را به یک سیستم ساده، قابل کنترل و قابل توسعه تبدیل می‌کنیم.</p>
+                            <ul class="service-card__tags"><li>سیستم‌های اختصاصی</li><li>اتوماسیون</li><li>داشبورد و گردش کار</li></ul>
+                        </div>
+                    </article>
 
-                <article class="service-row reveal">
-                    <div class="service-row__number">03</div>
-                    <div class="service-row__main">
-                        <h3>راهکارهای رشد دیجیتال</h3>
-                        <p>از ساختار سایت و محتوا تا تجربه کاربر و مسیر تبدیل؛ نقاط اصطکاک را پیدا می‌کنیم و بهبود می‌دهیم.</p>
-                        <ul><li>Conversion</li><li>Content</li><li>SEO و Analytics</li></ul>
-                    </div>
-                    <a href="#contact" class="service-row__link" aria-label="درخواست درباره راهکارهای رشد دیجیتال">↗</a>
-                </article>
+                    <article class="service-card reveal">
+                        <header class="service-card__header">
+                            <span class="service-card__index" aria-hidden="true">03</span>
+                            <div class="service-card__heading">
+                                <h3>راهکارهای رشد دیجیتال</h3>
+                            </div>
+                            <a href="{{ route('home', ['intent' => 'request', 'service' => 'growth']) }}#contact" class="service-card__action" aria-label="درخواست درباره راهکارهای رشد دیجیتال"><span class="service-card__action-label">گفتگو</span><span aria-hidden="true">↗</span></a>
+                        </header>
+                        <div class="service-card__content">
+                            <p class="service-card__description">از ساختار سایت و محتوا تا تجربه کاربر و مسیر تبدیل؛ نقاط اصطکاک را پیدا می‌کنیم و بهبود می‌دهیم.</p>
+                            <ul class="service-card__tags"><li>تبدیل</li><li>محتوا</li><li>جستجو و سنجش</li></ul>
+                        </div>
+                    </article>
+                @endforelse
             </div>
         </div>
     </section>
@@ -142,32 +164,19 @@
     <section class="section section--process" id="process">
         <div class="shell">
             <div class="section-intro reveal">
-                <p class="eyebrow"><span></span> HOW WE WORK</p>
-                <h2>از مسئله تا <em>راهکار قابل استفاده.</em></h2>
-                <p>فرآیند شفاف است تا بدانی در هر مرحله چه اتفاقی می‌افتد.</p>
+                <p class="eyebrow eyebrow--fa"><span></span> {{ $home['process']['eyebrow'] }}</p>
+                <h2>{!! \App\Models\HomePage::emphasized($home['process']['title'], $home['process']['accent']) !!}</h2>
+                <p>{{ $home['process']['lead'] }}</p>
             </div>
 
             <div class="process-line">
-                <article class="process-step reveal">
-                    <span>01</span>
-                    <h3>DISCOVER</h3>
-                    <p>شناخت کسب‌وکار، کاربر و مسئله اصلی.</p>
-                </article>
-                <article class="process-step reveal">
-                    <span>02</span>
-                    <h3>DESIGN</h3>
-                    <p>تعریف مسیر، تجربه و راهکار مناسب.</p>
-                </article>
-                <article class="process-step reveal">
-                    <span>03</span>
-                    <h3>BUILD</h3>
-                    <p>پیاده‌سازی تمیز، تست‌پذیر و قابل توسعه.</p>
-                </article>
-                <article class="process-step reveal">
-                    <span>04</span>
-                    <h3>GROW</h3>
-                    <p>اندازه‌گیری، یادگیری و بهبود مستمر.</p>
-                </article>
+                @foreach ($home['process']['steps'] as $step)
+                    <article class="process-step reveal">
+                        <span>{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
+                        <h3>{{ $step['title'] }}</h3>
+                        <p>{{ $step['body'] }}</p>
+                    </article>
+                @endforeach
             </div>
         </div>
     </section>
@@ -175,44 +184,76 @@
     <section class="section section--case" id="work">
         <div class="shell">
             <div class="section-intro reveal">
-                <p class="eyebrow"><span></span> SELECTED WORK</p>
-                <h2>نمونه‌کار را <em>با واقعیت</em> می‌سنجیم.</h2>
-                <p>به‌جای عددسازی، پروژه واقعی و تصمیم‌های واقعی را نشان می‌دهیم.</p>
+                <p class="eyebrow eyebrow--fa"><span></span> کیس‌استادی</p>
+                <h2>از مسئله تا <em>سیستم قابل اتکا.</em></h2>
+                <p>دو کار واقعی با همان استاندارد رشدینو — روشن، بدون عدد و ادعای توخالی.</p>
             </div>
 
-            <article class="case-study reveal">
-                <div class="case-study__visual">
-                    <span class="case-study__tag">CASE STUDY / 001</span>
-                    <div class="case-study__screen">
-                        <div class="case-study__screen-top"><span>PERSONNEL SYSTEM</span><span>ROSHDINO</span></div>
-                        <div class="case-study__screen-body">
-                            <span>EMPLOYEE</span><strong>HR MANAGEMENT</strong><span>ATTENDANCE / LEAVE / WORKFLOW</span>
+            @forelse ($works as $work)
+                <article class="case-study reveal{{ $work->images->isNotEmpty() ? '' : ' case-study--text' }}">
+                    @if ($work->images->isNotEmpty())
+                        <div class="case-study__visual">
+                            <img class="case-study__photo" src="{{ $work->images->first()->media->url() }}" alt="{{ $work->images->first()->alt ?: $work->title }}" width="{{ $work->images->first()->media->width }}" height="{{ $work->images->first()->media->height }}">
                         </div>
+                    @endif
+                    <div class="case-study__content">
+                        <p class="eyebrow eyebrow--fa"><span></span> {{ $work->title }}</p>
+                        <h3>{{ $work->summary ?: $work->title }}</h3>
+                        <div class="case-grid">
+                            <div><small>مسئله</small><p>{{ $work->problem }}</p></div>
+                            <div><small>رویکرد</small><p>{{ $work->solution }}</p></div>
+                            @if (filled($work->result))
+                                <div><small>نتیجه</small><p>{{ $work->result }}</p></div>
+                            @endif
+                            @if (filled($work->learning))
+                                <div><small>یادگیری</small><p>{{ $work->learning }}</p></div>
+                            @endif
+                        </div>
+                        @if ($work->technologies !== [])
+                            <div class="case-tech">
+                                @foreach ($work->technologies as $technology)
+                                    <span>{{ $technology }}</span>
+                                @endforeach
+                            </div>
+                        @endif
+                        <a href="{{ route('works.show', $work->slug) }}" class="text-link">خواندن کیس‌استادی <span aria-hidden="true">←</span></a>
                     </div>
-                </div>
-                <div class="case-study__content">
-                    <p class="eyebrow"><span></span> Personal System Faraja</p>
-                    <h3>یک سیستم واقعی برای مدیریت فرآیندهای پرسنلی.</h3>
-                    <div class="case-grid">
-                        <div><small>مسئله</small><p>مدیریت اطلاعات پرسنل و فرآیندهای مرتبط نیازمند یک سیستم یکپارچه بود.</p></div>
-                        <div><small>راهکار</small><p>یک سیستم Laravel-based با ساختار قابل توسعه و workflowهای مشخص.</p></div>
+                </article>
+            @empty
+                <article class="case-study case-study--text reveal">
+                    <div class="case-study__content">
+                        <p class="eyebrow eyebrow--fa"><span></span> Personal System Faraja</p>
+                        <h3>یک سیستم واقعی برای مدیریت فرآیندهای پرسنلی.</h3>
+                        <div class="case-grid">
+                            <div><small>مسئله</small><p>مدیریت اطلاعات پرسنل و فرآیندهای مرتبط نیازمند یک سیستم یکپارچه بود.</p></div>
+                            <div><small>راهکار</small><p>یک سیستم با ساختار قابل توسعه و گردش کار مشخص.</p></div>
+                        </div>
+                        <div class="case-tech"><span>Laravel</span><span>PHP</span><span>MariaDB</span><span>Blade</span></div>
+                        <a href="{{ route('home', ['intent' => 'request']) }}#contact" class="text-link">درباره یک پروژه مشابه صحبت کنیم <span aria-hidden="true">←</span></a>
                     </div>
-                    <div class="case-tech"><span>Laravel</span><span>PHP</span><span>MariaDB</span><span>Blade</span></div>
-                    <a href="#contact" class="text-link">درباره یک پروژه مشابه صحبت کنیم <span aria-hidden="true">←</span></a>
-                </div>
-            </article>
+                </article>
+            @endforelse
         </div>
     </section>
 
     <section class="section section--trust" id="about">
         <div class="shell trust">
             <div class="trust__statement reveal">
-                <p class="eyebrow"><span></span> OUR PRINCIPLE</p>
-                <h2>تکنولوژی برای ما هدف نیست؛ <em>ابزار حل مسئله است.</em></h2>
+                <p class="eyebrow eyebrow--fa"><span></span> {{ $home['principle']['eyebrow'] }}</p>
+                <h2>{!! \App\Models\HomePage::emphasized($home['principle']['title'], $home['principle']['accent']) !!}</h2>
             </div>
             <div class="trust__copy reveal">
-                <p>رشدینو از ترکیب توسعه نرم‌افزار، تجربه کاربر و نگاه رشد ساخته می‌شود. هدف، ساخت چیزی است که بعد از تحویل هم برای کسب‌وکار قابل استفاده و قابل توسعه بماند.</p>
-                <div class="trust__tags"><span>UX</span><span>SEO</span><span>PERFORMANCE</span><span>SECURITY</span><span>TESTING</span><span>SCALABILITY</span></div>
+                <p>{{ $home['principle']['lead'] }}</p>
+                <a href="{{ route('pages.show', 'about') }}" class="text-link">روش کار را بخوان <span aria-hidden="true">←</span></a>
+            </div>
+            <div class="principle-grid">
+                @foreach ($home['principle']['items'] as $item)
+                    <article class="principle reveal">
+                        <span>{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
+                        <h3>{{ $item['title'] }}</h3>
+                        <p>{{ $item['body'] }}</p>
+                    </article>
+                @endforeach
             </div>
         </div>
     </section>
@@ -220,38 +261,44 @@
     <section class="section section--faq" id="faq">
         <div class="shell faq-layout">
             <div class="section-intro reveal">
-                <p class="eyebrow"><span></span> FAQ</p>
-                <h2>قبل از شروع، <em>سؤال‌هایت را جواب بدهیم.</em></h2>
+                <p class="eyebrow eyebrow--fa"><span></span> {{ $home['faq']['eyebrow'] }}</p>
+                <h2>{!! \App\Models\HomePage::emphasized($home['faq']['title'], $home['faq']['accent']) !!}</h2>
             </div>
             <div class="faq-list">
-                <details class="faq-item reveal"><summary>اگر دقیقاً ندانم چه چیزی لازم دارم چه؟</summary><p>اشکالی ندارد. نقطه شروع، مسئله و هدف کسب‌وکار است؛ در گفت‌وگوی اولیه کمک می‌کنیم نیاز واقعی مشخص شود.</p></details>
-                <details class="faq-item reveal"><summary>قیمت پروژه چگونه تعیین می‌شود؟</summary><p>بعد از مشخص شدن دامنه کار، پیچیدگی، طراحی، توسعه و خروجی مورد انتظار، محدوده مناسب پروژه تعیین می‌شود.</p></details>
-                <details class="faq-item reveal"><summary>آیا پروژه بعداً قابل توسعه است؟</summary><p>بله. معماری و انتخاب تکنولوژی بر اساس نیاز واقعی و مسیر رشد پروژه انجام می‌شود تا توسعه آینده منطقی بماند.</p></details>
-                <details class="faq-item reveal"><summary>بعد از تحویل پروژه چه اتفاقی می‌افتد؟</summary><p>در صورت نیاز، پشتیبانی، نگهداری و توسعه‌های بعدی می‌تواند به‌صورت جداگانه ادامه پیدا کند.</p></details>
+                @foreach ($home['faq']['items'] as $item)
+                    <details class="faq-item reveal"><summary>{{ $item['question'] }}</summary><p>{{ $item['answer'] }}</p></details>
+                @endforeach
             </div>
         </div>
     </section>
 
     <section class="section section--contact" id="contact">
         <div class="shell contact-cta reveal">
-            <p class="eyebrow"><span></span> LET'S START</p>
+            <p class="eyebrow eyebrow--fa"><span></span> قدم بعدی</p>
             <h2>یک مسئله دیجیتال داری؟ <em>از همین‌جا شروع کنیم.</em></h2>
             <p>لازم نیست از قبل دقیقاً بدانی چه چیزی باید ساخته شود. مسئله را توضیح بده؛ مسیر مناسب را با هم پیدا می‌کنیم.</p>
-            <a href="mailto:hello@roshdino.test" class="button button--lime button--large">شروع گفتگو <span aria-hidden="true">←</span></a>
-            <small>این آدرس در نسخه توسعه‌ای سایت قرار دارد و قبل از انتشار عمومی با راه ارتباطی واقعی جایگزین می‌شود.</small>
+
+            @include('partials.lead-form')
         </div>
     </section>
 @endsection
 
 @push('head')
     <script type="application/ld+json">
-        {!! json_encode([
+        {!! json_encode(array_filter([
             '@' . 'context' => 'https://schema.org',
             '@' . 'type' => 'Organization',
-            'name' => 'رشدینو',
-            'alternateName' => 'ROSHDINO',
+            'name' => $site['brand'],
+            'alternateName' => $site['brand_latin'],
             'url' => url('/'),
             'description' => 'استودیو رشد دیجیتال برای طراحی و توسعه وب، نرم‌افزار اختصاصی و راهکارهای رشد دیجیتال.',
-        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+            'sameAs' => ($sameAs = array_values(array_filter([
+                $site['telegram'] !== '' ? 'https://t.me/'.$site['telegram'] : null,
+                $site['instagram'] !== '' ? $site['instagram'] : null,
+                $site['linkedin'] !== '' ? $site['linkedin'] : null,
+                $site['x'] !== '' ? $site['x'] : null,
+            ]))) !== [] ? $sameAs : null,
+            'telephone' => $site['phone'] !== '' ? $site['phone'] : null,
+        ]), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
     </script>
 @endpush
